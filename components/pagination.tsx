@@ -12,6 +12,7 @@ export function Pagination({ currentPage, totalPages, onPageChange }: Pagination
   const halfVisiblePages = Math.floor(maxVisiblePages / 2);
 
   let startPage = Math.max(currentPage - halfVisiblePages, 1);
+  // eslint-disable-next-line prefer-const
   let endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
 
   if (endPage - startPage + 1 < maxVisiblePages) {

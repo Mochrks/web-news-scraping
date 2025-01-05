@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 
 interface Comment {
   id: string
@@ -12,13 +12,12 @@ interface Comment {
   date: string
 }
 
-interface CommentsProps {
-  articleId: string
-}
 
-export function Comments({ articleId }: CommentsProps) {
+
+export function Comments() {
   const [comments, setComments] = useState<Comment[]>([])
   const [newComment, setNewComment] = useState('')
+
 
   const handleSubmitComment = () => {
     if (newComment.trim()) {

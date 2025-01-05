@@ -63,7 +63,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
           <p className="text-sm text-muted-foreground">Author: {article.author}</p>
         </CardFooter>
       </Card>
-      <Comments articleId={article.id} />
+      <Comments />
     </div>
   )
 }

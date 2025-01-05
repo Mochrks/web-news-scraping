@@ -8,7 +8,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { Grid2X2, List, TrendingUp } from 'lucide-react'
 import { allNews, trendingNews } from '@/lib/mockData'
-import { Pagination } from '@/components/ui/pagination'
+// import { Pagination } from '@/components/ui/pagination'
 import dynamic from 'next/dynamic'
 
 const DynamicToggleGroup = dynamic(() => import('@/components/ui/toggle-group').then(mod => mod.ToggleGroup), { ssr: false })
@@ -150,12 +150,25 @@ export default function Home() {
         ))}
       </div>
       <div className="mt-8">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-
-        />
+        <div className="mt-8 flex justify-center">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className="px-4 py-2 mx-2 bg-blue-500 text-white rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span className="px-4 py-2">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
+            disabled={currentPage === totalPages}
+            className="px-4 py-2 mx-2 bg-blue-500 text-white rounded disabled:opacity-50"
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   )
