@@ -9,7 +9,7 @@ export default function Footer() {
             <span className="font-bold">NewsNow</span>
           </Link>
           <p className="text-center text-sm leading-loose md:text-left">
-            &copy; 2024 NewsNow. All rights reserved. Developed by @{" "}
+            &copy; {new Date().getFullYear()} NewsNow. All rights reserved. Developed by @{" "}
             <a
               href="https://github.com/mochrks"
               target="_blank"
