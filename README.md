@@ -12,7 +12,7 @@
 
 ## Overview
 
-**Web News Scraping** is an advanced web application designed to aggregate and display news articles from multiples sources using cutting-edge web scraping techniques. The platform provides real-time news updates, comprehensive categorization, and an intuitive user interface.
+**Web News Scraping** is an advanced web application designed to aggregate and display news articles from multiples sources usings cutting-edge web scraping techniques. The platform provides real-time news updates, comprehensive categorization, and an intuitive user interface.
 
 ## Features
 
