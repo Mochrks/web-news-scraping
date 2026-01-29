@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 const config: Config = {
     darkMode: ["class"],
@@ -9,7 +10,14 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+        fontFamily: {
+            "display": ["var(--font-work-sans)", "sans-serif"],
+            "serif": ["var(--font-merriweather)", "serif"],
+        },
   		colors: {
+            "background-light": "#f6f6f8", 
+            "background-dark": "#121212", 
+            "surface-dark": "#1e1e1e",
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {
@@ -55,9 +63,12 @@ const config: Config = {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'
-  		}
+  		},
+        boxShadow: {
+            "glow": "0 0 15px rgba(59, 130, 246, 0.5)",
+        }
   	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 };
 export default config;

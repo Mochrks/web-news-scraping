@@ -1,98 +1,85 @@
 'use client'
 
-import { useState } from 'react'
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState, useEffect } from 'react'
+import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
-import Image from "next/image"
 import Link from "next/link"
-import { Grid2X2, List } from 'lucide-react'
-import { newsByCategory } from '@/lib/mockData'
-
-const ITEMS_PER_PAGE = 40;
+import { getAllNews, NewsItem } from '@/lib/api'
+import { Loader2 } from 'lucide-react'
 
 export default function CategoryPage({ params }: { params: { category: string } }) {
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
-  const [currentPage, setCurrentPage] = useState(1)
+  const [news, setNews] = useState<NewsItem[]>([])
+  const [loading, setLoading] = useState(true)
   const category = params.category.charAt(0).toUpperCase() + params.category.slice(1)
-  const categoryNews = newsByCategory[category] || []
 
-  const paginatedNews = categoryNews.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  )
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true)
+      try {
+        // Map common slugs to our API categories if needed, or just pass directly
+        const data = await getAllNews(category);
+        setNews(data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, [category])
 
-  const totalPages = Math.ceil(categoryNews.length / ITEMS_PER_PAGE)
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-20 flex justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    )
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-4xl font-bold mb-8">{category} News</h1>
-      <div className="flex justify-end mb-6">
-        <ToggleGroup type="single" value={viewMode} onValueChange={(value) => setViewMode(value as 'grid' | 'list')}>
-          <ToggleGroupItem value="grid" aria-label="Grid view">
-            <Grid2X2 className="h-4 w-4" />
-          </ToggleGroupItem>
-          <ToggleGroupItem value="list" aria-label="List view">
-            <List className="h-4 w-4" />
-          </ToggleGroupItem>
-        </ToggleGroup>
+    <div className="container mx-auto px-4 py-12 min-h-screen">
+      <div className="mb-8 border-b border-border pb-4">
+        <Badge className="mb-2 bg-primary">{category}</Badge>
+        <h1 className="text-4xl font-bold font-serif">{category} News</h1>
       </div>
-      <div className={`grid ${viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1'} gap-6`}>
-        {paginatedNews.map((news) => (
-          <Card key={news.id} className={`overflow-hidden ${viewMode === 'list' ? 'flex flex-col md:flex-row' : ''}`}>
-            <div className={`relative h-48 ${viewMode === 'list' ? 'md:w-1/3' : 'w-full'}`}>
-              {news.videoUrl ? (
-                <video src={news.videoUrl} controls className="w-full h-full object-cover" />
-              ) : (
-                <Image
-                  src={news.image}
-                  alt={news.title}
-                  layout="fill"
-                  objectFit="cover"
-                />
-              )}
-            </div>
-            <div className={`flex flex-col ${viewMode === 'list' ? 'md:w-2/3' : 'w-full'}`}>
-              <CardHeader>
-                <CardTitle className="text-xl line-clamp-2">{news.title}</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-2 line-clamp-3">{news.excerpt}</p>
-                <Badge>{news.category}</Badge>
-              </CardContent>
-              <CardFooter className="flex justify-between mt-auto">
-                <span className="text-sm text-muted-foreground">{new Date(news.date).toLocaleDateString()}</span>
-                <Button asChild variant="link">
-                  <Link href={`/article/${news.id}`}>Read more</Link>
-                </Button>
-              </CardFooter>
-            </div>
-          </Card>
-        ))}
-      </div>
-      <div className="mt-8">
-        <div className="mt-8 flex justify-center">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className="px-4 py-2 mx-2 bg-blue-500 text-white rounded disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span className="px-4 py-2">
-            Page {currentPage} of {totalPages}
-          </span>
-          <button
-            onClick={() => setCurrentPage((prev) => Math.min(prev + 1, totalPages))}
-            disabled={currentPage === totalPages}
-            className="px-4 py-2 mx-2 bg-blue-500 text-white rounded disabled:opacity-50"
-          >
-            Next
-          </button>
+
+      {news.length === 0 ? (
+        <div className="text-center py-20">
+          <p className="text-muted-foreground">No news found for this category at the moment.</p>
         </div>
-      </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {news.map((item) => (
+            <Card key={item.id} className="overflow-hidden bg-card border-border flex flex-col h-full group">
+              <Link href={`/article/${encodeURIComponent(item.id)}`} className="relative h-56 w-full overflow-hidden">
+                <div
+                  className="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                  style={{ backgroundImage: `url("${item.image}")` }}
+                />
+              </Link>
+              <div className="flex flex-col flex-1 p-6">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="text-xs font-bold text-primary uppercase tracking-wider">{item.source}</span>
+                  <span className="text-xs text-muted-foreground">{new Date(item.date).toLocaleDateString()}</span>
+                </div>
+                <Link href={`/article/${encodeURIComponent(item.id)}`}>
+                  <h3 className="text-xl font-bold font-serif mb-3 leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                    {item.title}
+                  </h3>
+                </Link>
+                <p className="text-sm text-muted-foreground line-clamp-3 mb-4 flex-1">
+                  {item.excerpt}
+                </p>
+                <div className="mt-auto pt-4 border-t border-border flex items-center text-sm font-medium text-primary">
+                  <Link href={`/article/${encodeURIComponent(item.id)}`} className="hover:underline">
+                    Read Full Story
+                  </Link>
+                </div>
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
-
