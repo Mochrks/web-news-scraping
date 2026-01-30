@@ -7,7 +7,7 @@ import { getAllNews } from '@/lib/api'
 import { NewsItem } from '@/lib/api'
 import { Comments } from '@/components/comments'
 import dynamic from 'next/dynamic'
-import { ArrowLeft, ExternalLink } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 
@@ -16,6 +16,9 @@ const DynamicShareButtons = dynamic(() => import('@/components/share-buttons').t
 export default function ArticlePage({ params }: { params: { id: string } }) {
   const [article, setArticle] = useState<NewsItem | null>(null)
   const [loading, setLoading] = useState(true)
+  const [fullContent, setFullContent] = useState<string | null>(null);
+  const [isScraping, setIsScraping] = useState(false);
+  const [relatedNews, setRelatedNews] = useState<NewsItem[]>([]);
 
   useEffect(() => {
     async function fetchArticle() {
@@ -24,6 +27,32 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
         const news = await getAllNews();
         const found = news.find(n => n.id === targetId || n.title === targetId);
         setArticle(found || null);
+
+        if (found) {
+          // Find related news
+          const related = news
+            .filter(n => n.category === found.category && n.id !== found.id)
+            .slice(0, 3);
+          setRelatedNews(related);
+
+          if (found.url) {
+            setIsScraping(true);
+            try {
+              // Fetch full content
+              const res = await fetch(`/api/scrape?url=${encodeURIComponent(found.url)}`);
+              if (res.ok) {
+                const data = await res.json();
+                if (data.content) {
+                  setFullContent(data.content);
+                }
+              }
+            } catch (err) {
+              console.error("Failed to scrape full content:", err);
+            } finally {
+              setIsScraping(false);
+            }
+          }
+        }
       } catch (e) {
         console.error(e);
       } finally {
@@ -37,7 +66,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
     return (
       <div className="min-h-screen bg-background text-foreground w-full">
         {/* Skeleton Hero */}
-        <div className="w-full h-[50vh] bg-slate-200 dark:bg-zinc-800 animate-pulse relative">
+        <div className="container mx-auto max-w-6xl h-[50vh] bg-slate-200 dark:bg-zinc-800 animate-pulse relative">
           <div className="absolute bottom-0 left-0 w-full p-8 container mx-auto max-w-6xl">
             <div className="h-6 w-32 bg-slate-300 dark:bg-zinc-700 rounded mb-4"></div>
             <div className="h-12 w-3/4 bg-slate-300 dark:bg-zinc-700 rounded mb-4"></div>
@@ -124,13 +153,6 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
       <div className="container mx-auto max-w-7xl px-4 md:px-6 py-12 lg:py-16">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
 
-          {/* Left Sidebar: Share (Sticky) */}
-          <div className="hidden lg:flex lg:col-span-1 flex-col items-center pt-2">
-            <div className="sticky top-24 flex flex-col gap-6 items-center">
-              <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest writing-mode-vertical rotate-180">SHARE</div>
-              <DynamicShareButtons url={`/article/${encodeURIComponent(article.id)}`} title={article.title} />
-            </div>
-          </div>
 
           {/* Center Column: Article Content + Comments */}
           <div className="col-span-1 lg:col-span-8">
@@ -143,16 +165,24 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
                 prose-p:leading-relaxed prose-p:text-slate-700 dark:prose-p:text-slate-300
                 prose-a:text-primary prose-a:no-underline hover:prose-a:underline
                 prose-img:rounded-lg prose-img:shadow-xl prose-img:my-8">
-              <div dangerouslySetInnerHTML={{ __html: article.content }} />
+
+              {isScraping ? (
+                <div className="space-y-4 animate-pulse">
+                  <div className="h-4 bg-slate-200 dark:bg-zinc-800 rounded w-full"></div>
+                  <div className="h-4 bg-slate-200 dark:bg-zinc-800 rounded w-full"></div>
+                  <div className="h-4 bg-slate-200 dark:bg-zinc-800 rounded w-5/6"></div>
+                  <div className="h-4. bg-slate-200 dark:bg-zinc-800 rounded w-full mt-4"></div>
+                  <div className="h-4 bg-slate-200 dark:bg-zinc-800 rounded w-4/6"></div>
+                </div>
+              ) : (
+                <div dangerouslySetInnerHTML={{ __html: fullContent || article.content }} />
+              )}
             </div>
 
             <div className="mt-16 pt-8 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
               <p className="text-sm text-slate-500 font-medium">Published in <span className="text-primary font-bold">{article.source}</span></p>
-              <Button asChild variant="default" className="gap-2 rounded-full px-6 shadow-lg hover:shadow-primary/20">
-                <a href={article.url} target="_blank" rel="noopener noreferrer">
-                  Read Original Source <ExternalLink className="h-4 w-4" />
-                </a>
-              </Button>
+              <DynamicShareButtons url={`/article/${encodeURIComponent(article.id)}`} title={article.title} />
+              {/* Button Removed */}
             </div>
 
             {/* Mobile Share (Visible only on small screens) */}
@@ -164,7 +194,7 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
             </div>
 
             {/* Comments Section (Aligned with content) */}
-            <div className="mt-16 pt-10 border-t-4 border-slate-100 dark:border-white/5">
+            <div className="mt-16 pt-10 border-t-4 border-slate-100 dark:border-white/5 ">
               <Comments />
             </div>
           </div>
@@ -174,18 +204,27 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
             <div className="sticky top-24">
               <h3 className="font-bold uppercase tracking-widest text-xs mb-6 text-slate-400">Related News</h3>
               <div className="flex flex-col gap-8">
-                {[1, 2, 3].map((i) => (
-                  <div key={i} className="group cursor-pointer">
-                    <div className="relative h-32 w-full mb-3 overflow-hidden rounded-md">
-                      <div className="absolute inset-0 bg-slate-200 dark:bg-zinc-800 animate-pulse group-hover:scale-105 transition-transform duration-500"></div>
-                      {/* Placeholder for actual related image. In real app, map real data */}
-                    </div>
-                    <div className="h-2 w-16 bg-primary/20 rounded mb-2"></div>
-                    <h4 className="font-serif font-bold leading-tight group-hover:text-primary transition-colors">
-                      Understanding the global impact of digital transformation
-                    </h4>
-                  </div>
-                ))}
+                {relatedNews.length > 0 ? (
+                  relatedNews.map((item) => (
+                    <Link href={`/article/${encodeURIComponent(item.id)}`} key={item.id} className="group cursor-pointer block">
+                      <div className="relative h-32 w-full mb-3 overflow-hidden rounded-md">
+                        <Image
+                          src={item.image}
+                          alt={item.title}
+                          layout="fill"
+                          objectFit="cover"
+                          className="group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                      <div className="text-[10px] uppercase font-bold text-primary mb-1 tracking-wider">{item.category}</div>
+                      <h4 className="font-serif font-bold leading-tight group-hover:text-primary transition-colors text-sm line-clamp-3">
+                        {item.title}
+                      </h4>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="text-sm text-slate-500 italic">No related news found.</p>
+                )}
               </div>
             </div>
           </div>

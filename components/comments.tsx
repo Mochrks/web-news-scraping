@@ -48,7 +48,7 @@ export function Comments() {
   }
 
   return (
-    <div className="mt-12 max-w-2xl mx-auto">
+    <div className="w-full h-full px-3">
       <h2 className="text-2xl font-bold mb-6 font-serif">Discussion</h2>
 
       <div className="mb-8">
