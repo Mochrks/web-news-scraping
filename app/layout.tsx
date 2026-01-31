@@ -5,6 +5,7 @@ import Header from '@/components/header'
 import Footer from '@/components/footer'
 import { ThemeProvider } from '@/components/theme-provider'
 import { LanguageProvider } from "@/context/LanguageContext";
+import SmoothScrolling from "@/components/smooth-scrolling";
 
 const workSans = Work_Sans({
   subsets: ['latin'],
@@ -35,11 +36,13 @@ export default function RootLayout({
       <body className={`${workSans.variable} ${merriweather.variable} font-display bg-background file:text-foreground`}>
         <LanguageProvider>
           <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <div className="flex min-h-screen w-full flex-col overflow-x-hidden bg-background text-foreground transition-colors duration-300">
-              <Header />
-              <main className="flex-1 flex flex-col items-center w-full">{children}</main>
-              <Footer />
-            </div>
+            <SmoothScrolling>
+              <div className="flex min-h-screen w-full flex-col overflow-x-hidden bg-background text-foreground transition-colors duration-300">
+                <Header />
+                <main className="flex-1 flex flex-col items-center w-full">{children}</main>
+                <Footer />
+              </div>
+            </SmoothScrolling>
           </ThemeProvider>
         </LanguageProvider>
       </body>
