@@ -18,41 +18,14 @@ export default function Footer() {
             </div>
           </div>
 
-          <div>
-            <h4 className="font-bold text-white uppercase tracking-widest text-xs mb-4">Sections</h4>
-            <ul className="flex flex-col gap-2 text-sm">
-              {['World', 'Business', 'Technology', 'Science', 'Health'].map(item => (
-                <li key={item}><Link href="https://github.com/mochrks" target="_blank" className="hover:text-white transition-colors">{item}</Link></li>
-              ))}
-            </ul>
-          </div>
 
-          <div>
-            <h4 className="font-bold text-white uppercase tracking-widest text-xs mb-4">Company</h4>
-            <ul className="flex flex-col gap-2 text-sm">
-              {['About Us', 'Careers', 'Code of Ethics', 'Contact'].map(item => (
-                <li key={item}><Link href="https://github.com/mochrks" target="_blank" className="hover:text-white transition-colors">{item}</Link></li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-bold text-white uppercase tracking-widest text-xs mb-4">Support</h4>
-            <ul className="flex flex-col gap-2 text-sm">
-              {['Subscribe', 'Gift Subscriptions', 'Help Center', 'Sitemap'].map(item => (
-                <li key={item}><Link href="https://github.com/mochrks" target="_blank" className="hover:text-white transition-colors">{item}</Link></li>
-              ))}
-            </ul>
-          </div>
         </div>
 
         <div className="pt-8 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-4 text-xs">
           <p>© 2025 The Daily News Portal. All rights reserved. Developed by <a href="https://github.com/mochrks" target="_blank" className="font-bold text-white hover:underline">mochrks</a>.</p>
-          <div className="flex gap-6">
-            <Link href="https://github.com/mochrks" target="_blank" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <Link href="https://github.com/mochrks" target="_blank" className="hover:text-white transition-colors">Terms of Service</Link>
-            <Link href="https://github.com/mochrks" target="_blank" className="hover:text-white transition-colors">Cookie Settings</Link>
-          </div>
+          <p className="text-xs text-slate-500 lg:text-right max-w-xl">
+            This application is a portfolio project for educational/experimentation purposes only. News content is the copyright of their respective sources.
+          </p>
         </div>
       </div>
     </footer>
