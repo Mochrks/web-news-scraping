@@ -181,16 +181,15 @@ export default function ArticlePage({ params }: { params: { id: string } }) {
 
             <div className="mt-16 pt-8 border-t border-slate-200 dark:border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">
               <p className="text-sm text-slate-500 font-medium">Published in <span className="text-primary font-bold">{article.source}</span></p>
-              <DynamicShareButtons url={`/article/${encodeURIComponent(article.id)}`} title={article.title} />
-              {/* Button Removed */}
+              <div className="hidden sm:block">
+                <DynamicShareButtons url={`/article/${encodeURIComponent(article.id)}`} title={article.title} />
+              </div>
             </div>
 
             {/* Mobile Share (Visible only on small screens) */}
-            <div className="lg:hidden mt-8 p-4 bg-slate-50 dark:bg-white/5 rounded-lg border border-slate-100 dark:border-white/10">
+            <div className="sm:hidden mt-8 p-6 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-100 dark:border-white/10">
               <h3 className="font-bold mb-4 text-xs uppercase tracking-widest text-slate-500">Share this article</h3>
-              <div className="flex gap-4">
-                <DynamicShareButtons url={`/article/${encodeURIComponent(article.id)}`} title={article.title} />
-              </div>
+              <DynamicShareButtons url={`/article/${encodeURIComponent(article.id)}`} title={article.title} />
             </div>
 
             {/* Comments Section (Aligned with content) */}
